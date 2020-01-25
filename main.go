@@ -14,16 +14,7 @@ import (
 )
 
 func main() {
-	flag.Parse()
-
-	args := flag.Args()
-	if len(args) < 3 {
-		fmt.Println("Input and/or output and/or hash file is missing.")
-		os.Exit(1)
-	}
-	inputFile := args[0]
-	outputFile := args[1]
-	hashFile := args[2]
+	inputFile, outputFile, hashFile := flagCheck()
 
 	// Open & read hashs files
 	hashs, err := os.Open(inputFile)
@@ -41,13 +32,19 @@ func main() {
 
 	// Starting the time counter
 	startTimer := time.Now()
+
 	// Open file
 	f, _ := os.OpenFile(hashFile, os.O_CREATE|os.O_RDONLY, 0400)
 	defer f.Close()
 	file := fls.LineFile(f)
 
-	// Regex for extraction
-	r, _ := regexp.Compile("([A-Z0-9]{32}):[0-9]{1,}")
+	r, _ := regexp.Compile("")
+	hash := scanner.Text()
+	if len(hash) == 32 { // Hash == NTLM
+		r, _ = regexp.Compile("([A-Z0-9]{32}):[0-9]{1,}")
+	} else { // Hash == SHA1
+		r, _ = regexp.Compile("([A-Z0-9]{40}):[0-9]{1,}")
+	}
 
 	// Whence is the point of reference for offset
 	// 0 = Beginning of file | 1 = Current position | 2 = End of file
@@ -73,13 +70,13 @@ func main() {
 		file.SeekLine(0, io.SeekCurrent)
 
 		// Extract hash from the line
-		length1 := make([]byte, 32)
+		length1 := make([]byte, len(hash))
 		n1, _ := f.Read(length1)
 		extract := string(length1[:n1])
 		for {
 			if hash == extract {
 				start, _ = file.SeekLine(0, io.SeekCurrent)
-				length1 = make([]byte, 42)
+				length1 = make([]byte, len(hash)+12)
 				n1, _ = f.Read(length1)
 				extract = string(length1[:n1])
 
@@ -90,24 +87,16 @@ func main() {
 			} else if hash > extract {
 				start = mid
 				mid = start + (end-start)/2
-
-				file.Seek(mid, whence)
-				file.SeekLine(0, io.SeekCurrent)
-
-				length1 = make([]byte, 32)
-				n1, _ = f.Read(length1)
-				extract = string(length1[:n1])
 			} else {
 				end = mid
 				mid = start + (end-start)/2
-
-				file.Seek(mid, whence)
-				file.SeekLine(0, io.SeekCurrent)
-
-				length1 = make([]byte, 32)
-				n1, _ = f.Read(length1)
-				extract = string(length1[:n1])
 			}
+			file.Seek(mid, whence)
+			file.SeekLine(0, io.SeekCurrent)
+
+			length1 = make([]byte, len(hash))
+			n1, _ = f.Read(length1)
+			extract = string(length1[:n1])
 
 			if start == mid || end == mid {
 				break
@@ -119,4 +108,16 @@ func main() {
 	// Time calculation
 	fmt.Printf("%d hashs analyzed and %d found \n", v, x)
 	log.Printf("It took : %s", time.Since(startTimer))
+}
+
+// Check if flag is provided
+func flagCheck() (string, string, string) {
+	flag.Parse()
+
+	args := flag.Args()
+	if len(args) < 3 {
+		fmt.Println("Input and/or output and/or hash file is missing.")
+		os.Exit(1)
+	}
+	return args[0], args[1], args[2]
 }
