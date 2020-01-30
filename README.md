@@ -22,8 +22,8 @@ go build main.go
 ```
 
 ## Screenshots
-Example of use on a list of more than 20,000 hashes (29sec) :
-![enter image description here](https://zupimages.net/up/20/04/88ix.png)
+Example of use on a list of more than 20,000 hashes (9sec) (Intel Core i7 8565U)
+![enter image description here](https://zupimages.net/up/20/05/cudb.png)
 
 ## Improvements
 Feel free to contact me on [Twitter](https://twitter.com/J0_mart) or do a PR to improve the script.
