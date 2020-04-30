@@ -2,21 +2,21 @@ package main
 
 import (
 	"bufio"
+	"encoding/binary"
+	"encoding/hex"
 	"flag"
 	"fmt"
-	"io"
 	"log"
 	"os"
-	"regexp"
+	"strconv"
 	"time"
-
-	"github.com/stoicperlman/fls"
 )
 
 func main() {
-	inputFile, outputFile, hashFile := flagCheck()
+	// READ INPUT FLAG
+	inputFile, hashType, outputFile, hashFile := flagCheck()
 
-	// Open & read hashs files
+	// OPEN INPUT HASH FILE
 	hashs, err := os.Open(inputFile)
 	if err != nil {
 		log.Fatal(err)
@@ -24,82 +24,94 @@ func main() {
 	defer hashs.Close()
 	scanner := bufio.NewScanner(hashs)
 
+	// PREPARE OUTPUT FILE
 	out, err := os.OpenFile(outputFile, os.O_CREATE|os.O_RDWR, 0600)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer out.Close()
 
-	// Starting the time counter
-	startTimer := time.Now()
-
-	// Open file
+	// OPEN HIBP HASH FILE
 	f, _ := os.OpenFile(hashFile, os.O_CREATE|os.O_RDONLY, 0400)
 	defer f.Close()
-	file := fls.LineFile(f)
 
-	r, _ := regexp.Compile("")
-	hash := scanner.Text()
-	if len(hash) == 32 { // Hash == NTLM
-		r, _ = regexp.Compile("([A-Z0-9]{32}):[0-9]{1,}")
-	} else { // Hash == SHA1
-		r, _ = regexp.Compile("([A-Z0-9]{40}):[0-9]{1,}")
-	}
+	// START TIME COUNTER
+	startTimer := time.Now()
 
-	// Whence is the point of reference for offset
-	// 0 = Beginning of file | 1 = Current position | 2 = End of file
-	var whence int = 0
-
-	// Count the number of bytes
+	// COUNT THE NUMBER OF BYTES FOR HIBP HASH FILE
 	fStat, _ := f.Stat()
 
-	v := 0
-	x := 0
+	v := 0 // Hashs analyzed
+	x := 0 // Hashs found
+
+	// START OF FILE IN INT64
+	start := int64(0)
+
+	var byteLength int64
+	var hashLength int
+
+	// DEFINE HASH TYPE
+	if hashType == "NTLM" {
+		byteLength = 20 // Necessary byte length for extract in binary
+		hashLength = 16 // Hash length in bytes inside the binary
+	} else if hashType == "SHA1" {
+		byteLength = 24
+		hashLength = 20
+	}
 
 	for scanner.Scan() {
 		hash := scanner.Text()
-		// Start of file in Int64
-		start := int64(whence)
-		//End of file in Int64
+
+		// END OF FILE IN INT64
 		end := fStat.Size()
-		// Retrieves the middle of the file (in bytes)
+
+		// RETRIEVES THE MIDDLE OF FILE IN BYTES
 		mid := start + (end-start)/2
 
-		// Go to the middle at the beginning of the line
-		file.Seek(mid, whence)
-		file.SeekLine(0, io.SeekCurrent)
+		for mid%byteLength != 0 {
+			mid += 1
+		}
+
+		f.Seek(mid, 0)
 
 		// Extract hash from the line
-		length1 := make([]byte, len(hash))
-		n1, _ := f.Read(length1)
-		extract := string(length1[:n1])
+		extract := make([]byte, byteLength) // 20 for NTLM && 24 for SHA1
+		f.Read(extract)
+		hashExtract := hex.EncodeToString(extract[:hashLength])
+		occurenceHash := binary.BigEndian.Uint32(extract[hashLength:byteLength])
+
 		for {
-			if hash == extract {
-				start, _ = file.SeekLine(0, io.SeekCurrent)
-				length1 = make([]byte, len(hash)+12)
-				n1, _ = f.Read(length1)
-				extract = string(length1[:n1])
-
-				out.WriteString(r.FindString(extract) + "\n")
+			if hash == hashExtract {
 				x++
-
+				out.WriteString(hashExtract + ":" + strconv.FormatUint(uint64(occurenceHash), 10) + "\n") // Write HASH & OCCURENCE TO OUTPUT FILE
 				break
-			} else if hash > extract {
+			} else if hash > hashExtract {
 				start = mid
 				mid = start + (end-start)/2
+				for mid%byteLength != 0 { // Necessary to make sure the position is at the beginning of a hash.
+					mid -= 1
+				}
 			} else {
 				end = mid
 				mid = start + (end-start)/2
+				for mid%byteLength != 0 { // Necessary to make sure the position is at the beginning of a hash.
+					mid -= 1
+				}
 			}
-			file.Seek(mid, whence)
-			file.SeekLine(0, io.SeekCurrent)
-
-			length1 = make([]byte, len(hash))
-			n1, _ = f.Read(length1)
-			extract = string(length1[:n1])
+			f.Seek(mid, 0) // Repositioning in the middle
+			extract = make([]byte, byteLength)
+			f.Read(extract)
+			hashExtract = hex.EncodeToString(extract[:hashLength])
+			occurenceHash = binary.BigEndian.Uint32(extract[hashLength:byteLength])
 
 			if start == mid || end == mid {
-				break
+				if hash == hashExtract {
+					out.WriteString(hashExtract + ":" + strconv.FormatUint(uint64(occurenceHash), 10) + "\n") //Write HASH & OCCURENCE TO OUTPUT FILE
+					x++
+					break
+				} else {
+					break
+				}
 			}
 		}
 		v++
@@ -111,13 +123,13 @@ func main() {
 }
 
 // Check if flag is provided
-func flagCheck() (string, string, string) {
+func flagCheck() (string, string, string, string) {
 	flag.Parse()
 
 	args := flag.Args()
-	if len(args) < 3 {
-		fmt.Println("Input and/or output and/or hash file is missing.")
+	if len(args) < 4 {
+		fmt.Println("Input and/or hashType and/or output and/or hash file is missing.")
 		os.Exit(1)
 	}
-	return args[0], args[1], args[2]
+	return args[0], args[1], args[2], args[3]
 }
