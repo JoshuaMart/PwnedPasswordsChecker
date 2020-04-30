@@ -30,7 +30,7 @@ go build main.go
 Thanks to the use of a "compressed" format the tool has largely gained in performance, 
 example of use between the old version and the new one with a list of 3757 hashs (Intel Core I7 8565U) :
 
-![Screenshot](https://zupimages.net/up/20/18/40hz.png)
+![Screenshot](https://zupimages.net/up/20/18/5nyu.png)
 
 ## Improvements
 Feel free to contact me on [Twitter](https://twitter.com/J0_mart) or do a PR to improve the script.
