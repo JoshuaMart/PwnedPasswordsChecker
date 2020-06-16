@@ -27,11 +27,9 @@ go build main.go
 ```
 
 ## Screenshots
-Thanks to the use of a "compressed" format the tool has largely gained in performance, example of use between the old version and the new one with a list of 3757 hashs (Intel Core I7 8565U) :
-![Screenshot](https://zupimages.net/up/20/18/40hz.png)
+Thanks to the use of a "compressed" format the tool has largely gained in performance, example of use between the old version and the new one with a list of 20,000 hashes (Intel Core I7 8565U) :
 
-Example of use on a list of more than 20,000 hashes (9sec) (Intel Core i7 8565U)
-![enter image Screenshot here](https://zupimages.net/up/20/05/cudb.png)
+![Screenshot](https://zupimages.net/up/20/05/cudb.png)
 
 ## Improvements
 Feel free to contact me on [Twitter](https://twitter.com/J0_mart) or do a PR to improve the script.
