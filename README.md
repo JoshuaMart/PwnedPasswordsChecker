@@ -1,5 +1,5 @@
 # PwnedPasswordsChecker
-![enter image description here](https://zupimages.net/up/20/04/zsp8.png)![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg) ![made-with-go](https://img.shields.io/badge/made%20with-go-blue)  ![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)
+![banner](https://zupimages.net/up/20/04/zsp8.png)![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg) ![made-with-go](https://img.shields.io/badge/made%20with-go-blue)  ![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)
 
 **PwnedPasswordsChecker** is a tool that checks if the hash of a known password (in SHA1 or NTLM format) is present in the list of I Have Been Pwned leaks and the number of occurrences.
 
@@ -27,15 +27,11 @@ go build main.go
 ```
 
 ## Screenshots
-<<<<<<< HEAD
-Thanks to the use of a "compressed" format the tool has largely gained in performance, 
-example of use between the old version and the new one with a list of 3757 hashs (Intel Core I7 8565U) :
-
+Thanks to the use of a "compressed" format the tool has largely gained in performance, example of use between the old version and the new one with a list of 3757 hashs (Intel Core I7 8565U) :
 ![Screenshot](https://zupimages.net/up/20/18/40hz.png)
-=======
+
 Example of use on a list of more than 20,000 hashes (9sec) (Intel Core i7 8565U)
-![enter image description here](https://zupimages.net/up/20/05/cudb.png)
->>>>>>> master
+![enter image Screenshot here](https://zupimages.net/up/20/05/cudb.png)
 
 ## Improvements
 Feel free to contact me on [Twitter](https://twitter.com/J0_mart) or do a PR to improve the script.
