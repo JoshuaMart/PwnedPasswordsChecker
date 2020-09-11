@@ -3,11 +3,11 @@
 
 **PwnedPasswordsChecker** is a tool that checks if the hash of a known password (in SHA1 or NTLM format) is present in the list of I Have Been Pwned leaks and the number of occurrences.
 
-You can download the hash-coded version for SHA1 [here](https://downloads.pwnedpasswords.com/passwords/pwned-passwords-sha1-ordered-by-hash-v5.7z) or the hash-coded version for NTLM [here](https://downloads.pwnedpasswords.com/passwords/pwned-passwords-ntlm-ordered-by-hash-v5.7z)
+You can download the hash-coded version for SHA1 [here](https://downloads.pwnedpasswords.com/passwords/pwned-passwords-sha1-ordered-by-hash-v6.7z) or the hash-coded version for NTLM [here](https://downloads.pwnedpasswords.com/passwords/pwned-passwords-ntlm-ordered-by-hash-v6.7z)
 
 Once the list is downloaded it is then necessary to convert it to binary by using my other tool [HIBP PasswordList Slimmer](https://github.com/JoshuaMart/HIBP_PasswordList_Slimmer)
 
-*This script only works with the version sorted by hash and entry hashes must be in lowercase and preferably ordered by hashs*
+*This script only works with the HIBP version sorted by hash and entry hashes must be in lowercase and preferably ordered by hashs*
 
 ## Usage :
 ```
