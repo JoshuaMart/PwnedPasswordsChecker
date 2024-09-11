@@ -1,5 +1,5 @@
 # PwnedPasswordsChecker
-![banner](https://zupimages.net/up/20/04/zsp8.png)![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg) ![made-with-go](https://img.shields.io/badge/made%20with-go-blue)  ![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)
+![banner](https://zupimages.net/up/20/04/zsp8.png)![Maintenance](https://img.shields.io/badge/Maintained%3F-no-red.svg) ![made-with-go](https://img.shields.io/badge/made%20with-go-blue)  ![MIT license](https://img.shields.io/badge/License-MIT-blue.svg)
 
 **PwnedPasswordsChecker** is a tool that checks if the hash of a known password (in SHA1 or NTLM format) is present in the list of I Have Been Pwned leaks and the number of occurrences.
 
